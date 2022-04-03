@@ -32,9 +32,13 @@ handleCall(_Msg, _State, _FROM) ->
 handleCast(_Msg, _State) ->
    kpS.
 
-handleInfo({timeout, TimerRef, Msg}, _State) ->
+handleInfo({timeout, TimerRef, MFA}, _State) ->
    %% 确认Msg格式 然后做分发处理
-   io:format("the timer time out ~p ~p ~n", [TimerRef, Msg]),
+   {M, F, A} = MFA,
+   try M:F(A, TimerRef)
+   catch C:R ->
+      error_logger:error_msg("gTimer timeout error MFA:~p C:~p R:~p~n", [MFA, C, R])
+   end,
    kpS;
 handleInfo(_Msg, _State) ->
    kpS.
