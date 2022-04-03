@@ -7,6 +7,7 @@
    , stop/0
    , startWork/1
    , setTimer/2
+   , setTimer/3
    , getTimer/1
    , delTimer/1
 ]).
@@ -37,14 +38,19 @@ stop() ->
 
 setTimer(Time, Msg) ->
    Cnt = ?gTimerCfg:getV(?workCnt),
-   Idx = erlang:phash2(self(), Cnt) + 1,
+   Idx = rand:uniform(Cnt),
+   erlang:start_timer(Time, ?gTimerCfg:getV(Idx), Msg).
+
+setTimer(Time, Msg, Strategy) ->
+   Cnt = ?gTimerCfg:getV(?workCnt),
+   Idx = ?IIF(Strategy == rand, rand:uniform(Cnt), erlang:phash2(self(), Cnt) + 1),
    erlang:start_timer(Time, ?gTimerCfg:getV(Idx), Msg).
 
 getTimer(TimerRef) ->
    erlang:read_timer(TimerRef).
 
 delTimer(TimerRef) ->
-   erlang:cancel_timer(TimerRef).
+   erlang:cancel_timer(TimerRef) .
 
 
 
