@@ -13,7 +13,7 @@
 ]).
 
 timerName(Idx) ->
-   binary_to_atom(<<"$gtWSork_", (integer_to_binary(Idx))/binary>>).
+   binary_to_atom(<<"$gtWork_", (integer_to_binary(Idx))/binary>>).
 
 -spec startWork(Cnt :: non_neg_integer()) -> ok | {error, term()}.
 startWork(Cnt) when Cnt > 0 ->
