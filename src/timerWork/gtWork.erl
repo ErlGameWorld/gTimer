@@ -35,10 +35,11 @@ handleCast(_Msg, _State) ->
 handleInfo({timeout, TimerRef, MFA}, _State) ->
    %% 确认Msg格式 然后做分发处理
    {M, F, A} = MFA,
-   try M:F(A, TimerRef)
-   catch C:R ->
-      error_logger:error_msg("gTimer timeout error MFA:~p C:~p R:~p~n", [MFA, C, R])
-   end,
+   spawn(M, F, [A, TimerRef]),
+   % try M:F(A, TimerRef)
+   % catch C:R ->
+   %    error_logger:error_msg("gTimer timeout error MFA:~p C:~p R:~p~n", [MFA, C, R])
+   % end,
    kpS;
 handleInfo(_Msg, _State) ->
    kpS.

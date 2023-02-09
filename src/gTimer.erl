@@ -48,6 +48,10 @@ setTimer(Time, MFA, Strategy) ->
    Idx = ?IIF(Strategy == rand, rand:uniform(Cnt), erlang:phash2(self(), Cnt) + 1),
    erlang:start_timer(Time, ?gTimerCfg:getV(Idx), MFA).
 
+-spec getTimer(TimerRef :: reference()) -> false |  non_neg_integer().
+getTimer(TimerRef) ->
+   erlang:read_timer(TimerRef).
+
 -spec asyncDelTimer(TimerRef :: reference()) -> false |  non_neg_integer().
 asyncDelTimer(TimerRef) ->
    erlang:cancel_timer(TimerRef, [{async, true}, {info, false}]).
