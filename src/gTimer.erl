@@ -45,7 +45,7 @@ setTimer(Time, MFA) ->
 -spec setTimer(Time :: non_neg_integer(), MFA :: {module(), atom(), term()}, Strategy :: rand | bind) -> reference().
 setTimer(Time, MFA, Strategy) ->
    Cnt = ?gTimerCfg:getV(?workCnt),
-   Idx = ?IIF(Strategy == rand, rand:uniform(Cnt), erlang:phash2(self(), Cnt) + 1),
+   Idx = ?CASE(Strategy == rand, rand:uniform(Cnt), erlang:phash2(self(), Cnt) + 1),
    erlang:start_timer(Time, ?gTimerCfg:getV(Idx), MFA).
 
 -spec getTimer(TimerRef :: reference()) -> false |  non_neg_integer().
