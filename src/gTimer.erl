@@ -8,6 +8,7 @@
    , startWork/1
    , setTimer/2
    , setTimer/3
+   , setTimer/4
    , getTimer/1
    , asyncDelTimer/1
    , syncDelTimer/1
@@ -40,13 +41,19 @@ stop() ->
 setTimer(Time, MFA) ->
    Cnt = ?gTimerCfg:getV(?workCnt),
    Idx = rand:uniform(Cnt),
-   erlang:start_timer(Time, ?gTimerCfg:getV(Idx), MFA).
+   erlang:start_timer(Time, ?gTimerCfg:getV(Idx), {newSpawn, MFA}).
 
--spec setTimer(Time :: non_neg_integer(), MFA :: {module(), atom(), term()}, Strategy :: rand | bind) -> reference().
-setTimer(Time, MFA, Strategy) ->
+-spec setTimer(Time :: non_neg_integer(), MFA :: {module(), atom(), term()}, ChoseStrategy :: rand | bind) -> reference().
+setTimer(Time, MFA, ChoseStrategy) ->
    Cnt = ?gTimerCfg:getV(?workCnt),
-   Idx = ?CASE(Strategy == rand, rand:uniform(Cnt), erlang:phash2(self(), Cnt) + 1),
-   erlang:start_timer(Time, ?gTimerCfg:getV(Idx), MFA).
+   Idx = ?CASE(ChoseStrategy == rand, rand:uniform(Cnt), erlang:phash2(self(), Cnt) + 1),
+   erlang:start_timer(Time, ?gTimerCfg:getV(Idx), {newSpawn, MFA}).
+
+-spec setTimer(Time :: non_neg_integer(), MFA :: {module(), atom(), term()}, ChoseStrategy :: rand | bind, WorkStrategy :: newSpawn | curApply) -> reference().
+setTimer(Time, MFA, ChoseStrategy, WorkStrategy) ->
+   Cnt = ?gTimerCfg:getV(?workCnt),
+   Idx = ?CASE(ChoseStrategy == rand, rand:uniform(Cnt), erlang:phash2(self(), Cnt) + 1),
+   erlang:start_timer(Time, ?gTimerCfg:getV(Idx), {WorkStrategy, MFA}).
 
 -spec getTimer(TimerRef :: reference()) -> false |  non_neg_integer().
 getTimer(TimerRef) ->
